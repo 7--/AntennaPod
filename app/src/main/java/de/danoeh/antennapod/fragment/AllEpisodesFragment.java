@@ -255,6 +255,7 @@ public class AllEpisodesFragment extends Fragment {
             }
         } else {
             return true;
+
         }
 
     }

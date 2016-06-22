@@ -58,10 +58,10 @@ public class AdapterUtils {
                                     if (size > 0) {
                                         txtvPos.setText(Converter.byteToString(size));
                                     } else {
-                                        txtvPos.setText("");
+                                        //txtvPos.setText("");
                                     }
                                 }, error -> {
-                                    txtvPos.setText("");
+                                    //txtvPos.setText("");
                                     Log.e(TAG, Log.getStackTraceString(error));
                                 });
             } else {
