@@ -1,5 +1,6 @@
 package de.danoeh.antennapod.core.util;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.apache.commons.lang3.StringUtils;
@@ -7,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -17,13 +19,7 @@ public class DateUtils {
     
 	private static final String TAG = "DateUtils";
 
-    private static final SimpleDateFormat parser = new SimpleDateFormat("", Locale.US);
     private static final TimeZone defaultTimezone = TimeZone.getTimeZone("GMT");
-
-    static {
-        parser.setLenient(false);
-        parser.setTimeZone(defaultTimezone);
-    }
 
     public static Date parse(final String input) {
         if(input == null) {
@@ -84,6 +80,10 @@ public class DateUtils {
                 "yyyy-MM-dd"
         };
 
+        SimpleDateFormat parser = new SimpleDateFormat("", Locale.US);
+        parser.setLenient(false);
+        parser.setTimeZone(defaultTimezone);
+
         ParsePosition pos = new ParsePosition(0);
         for(String pattern : patterns) {
             parser.applyPattern(pattern);
@@ -115,13 +115,13 @@ public class DateUtils {
         int idx = 0;
         if (parts.length == 3) {
             // string has hours
-            result += Integer.valueOf(parts[idx]) * 3600000L;
+            result += Integer.parseInt(parts[idx]) * 3600000L;
             idx++;
         }
         if (parts.length >= 2) {
-            result += Integer.valueOf(parts[idx]) * 60000L;
+            result += Integer.parseInt(parts[idx]) * 60000L;
             idx++;
-            result += (Float.valueOf(parts[idx])) * 1000L;
+            result += (Float.parseFloat(parts[idx])) * 1000L;
         }
         return result;
     }
@@ -140,5 +140,21 @@ public class DateUtils {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
         format.setTimeZone(defaultTimezone);
         return format.format(date);
+    }
+
+    public static String formatAbbrev(final Context context, final Date date) {
+        if(date == null) {
+            return "";
+        }
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.add(GregorianCalendar.YEAR, -1);
+        // some padding, because no one really remembers what day of the month it is
+        cal.add(GregorianCalendar.DAY_OF_MONTH, 10);
+        boolean withinLastYear = date.after(cal.getTime());
+        int format = android.text.format.DateUtils.FORMAT_ABBREV_ALL;
+        if(withinLastYear) {
+            format |= android.text.format.DateUtils.FORMAT_NO_YEAR;
+        }
+        return android.text.format.DateUtils.formatDateTime(context, date.getTime(), format);
     }
 }

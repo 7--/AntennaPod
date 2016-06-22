@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import de.danoeh.antennapod.core.asynctask.ImageResource;
 import de.danoeh.antennapod.core.storage.DBReader;
@@ -75,7 +76,13 @@ public class FeedItem extends FeedComponent implements ShownotesProvider, Flattr
     private List<Chapter> chapters;
     private FeedImage image;
 
-    private boolean autoDownload = true;
+    /*
+     *   0: auto download disabled
+     *   1: auto download enabled (default)
+     * > 1: auto download enabled, (approx.) timestamp of the last failed attempt
+     *      where last digit denotes the number of failed attempts
+     */
+    private long autoDownload = 1;
 
     /**
      * Any tags assigned to this item
@@ -93,7 +100,7 @@ public class FeedItem extends FeedComponent implements ShownotesProvider, Flattr
      * */
     public FeedItem(long id, String title, String link, Date pubDate, String paymentLink, long feedId,
                     FlattrStatus flattrStatus, boolean hasChapters, FeedImage image, int state,
-                    String itemIdentifier, boolean autoDownload) {
+                    String itemIdentifier, long autoDownload) {
         this.id = id;
         this.title = title;
         this.link = link;
@@ -162,11 +169,10 @@ public class FeedItem extends FeedComponent implements ShownotesProvider, Flattr
         FlattrStatus flattrStatus = new FlattrStatus(cursor.getLong(indexFlattrStatus));
         int state = cursor.getInt(indexRead);
         String itemIdentifier = cursor.getString(indexItemIdentifier);
-        boolean autoDownload = cursor.getInt(indexAutoDownload) > 0;
+        long autoDownload = cursor.getLong(indexAutoDownload);
 
-        FeedItem item = new FeedItem(id, title, link, pubDate, paymentLink, feedId, flattrStatus,
+        return new FeedItem(id, title, link, pubDate, paymentLink, feedId, flattrStatus,
                 hasChapters, null, state, itemIdentifier, autoDownload);
-        return item;
     }
 
     public void updateFromOther(FeedItem other) {
@@ -189,6 +195,8 @@ public class FeedItem extends FeedComponent implements ShownotesProvider, Flattr
         if (other.media != null) {
             if (media == null) {
                 setMedia(other.media);
+                // reset to new if feed item did link to a file before
+                setNew();
             } else if (media.compareWithOther(other.media)) {
                 media.updateFromOther(other.media);
             }
@@ -352,24 +360,16 @@ public class FeedItem extends FeedComponent implements ShownotesProvider, Flattr
     }
 
     private boolean isPlaying() {
-        if (media != null) {
-            return media.isPlaying();
-        }
-        return false;
+        return media != null && media.isPlaying();
     }
 
     @Override
     public Callable<String> loadShownotes() {
-        return new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-
-                if (contentEncoded == null || description == null) {
-                    DBReader.loadExtraInformationOfFeedItem(FeedItem.this);
-
-                }
-                return (contentEncoded != null) ? contentEncoded : description;
+        return () -> {
+            if (contentEncoded == null || description == null) {
+                DBReader.loadExtraInformationOfFeedItem(FeedItem.this);
             }
+            return (contentEncoded != null) ? contentEncoded : description;
         };
     }
 
@@ -449,18 +449,37 @@ public class FeedItem extends FeedComponent implements ShownotesProvider, Flattr
     }
 
     public void setAutoDownload(boolean autoDownload) {
-        this.autoDownload = autoDownload;
+        this.autoDownload = autoDownload ? 1 : 0;
     }
 
     public boolean getAutoDownload() {
-        return this.autoDownload;
+        return this.autoDownload > 0;
+    }
+
+    public int getFailedAutoDownloadAttempts() {
+        if (autoDownload <= 1) {
+            return 0;
+        }
+        int failedAttempts = (int)(autoDownload % 10);
+        if (failedAttempts == 0) {
+            failedAttempts = 10;
+        }
+        return failedAttempts;
     }
 
     public boolean isAutoDownloadable() {
-        return this.hasMedia() &&
-                false == this.getMedia().isPlaying() &&
-                false == this.getMedia().isDownloaded() &&
-                this.getAutoDownload();
+        if (media == null || media.isPlaying() || media.isDownloaded() || autoDownload == 0) {
+            return false;
+        }
+        if (autoDownload == 1) {
+            return true;
+        }
+        int failedAttempts = getFailedAutoDownloadAttempts();
+        double magicValue = 1.767; // 1.767^(10[=#maxNumAttempts]-1) = 168 hours / 7 days
+        int millisecondsInHour = 3600000;
+        long waitingTime = (long) (Math.pow(magicValue, failedAttempts - 1) * millisecondsInHour);
+        long grace = TimeUnit.MINUTES.toMillis(5);
+        return System.currentTimeMillis() > (autoDownload + waitingTime - grace);
     }
 
     /**

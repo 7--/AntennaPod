@@ -1,8 +1,8 @@
 package de.danoeh.antennapod.core.syndication.handler;
 
+import android.support.v4.util.ArrayMap;
+
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Stack;
 
@@ -32,7 +32,7 @@ public class HandlerState {
     /**
      * Namespaces that have been defined so far.
      */
-    protected HashMap<String, Namespace> namespaces;
+    protected Map<String, Namespace> namespaces;
     protected Stack<Namespace> defaultNamespaces;
     /**
      * Buffer for saving characters.
@@ -42,16 +42,16 @@ public class HandlerState {
     /**
      * Temporarily saved objects.
      */
-    protected HashMap<String, Object> tempObjects;
+    protected Map<String, Object> tempObjects;
 
     public HandlerState(Feed feed) {
         this.feed = feed;
-        alternateUrls = new LinkedHashMap<String, String>();
-        items = new ArrayList<FeedItem>();
-        tagstack = new Stack<SyndElement>();
-        namespaces = new HashMap<String, Namespace>();
-        defaultNamespaces = new Stack<Namespace>();
-        tempObjects = new HashMap<String, Object>();
+        alternateUrls = new ArrayMap<>();
+        items = new ArrayList<>();
+        tagstack = new Stack<>();
+        namespaces = new ArrayMap<>();
+        defaultNamespaces = new Stack<>();
+        tempObjects = new ArrayMap<>();
     }
 
     public Feed getFeed() {
@@ -105,7 +105,7 @@ public class HandlerState {
         alternateUrls.put(url, title);
     }
 
-    public HashMap<String, Object> getTempObjects() {
+    public Map<String, Object> getTempObjects() {
         return tempObjects;
     }
 }

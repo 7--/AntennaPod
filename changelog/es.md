@@ -1,9 +1,41 @@
 Registro de cambios
 ==========
 
-Version 1.4.0.12
+Versión 1.6.0
+-------------
+* Nuevas funciones:
+ * Soporte Experimental de Chromecast
+ * Resumen de suscripciones
+ * Soporte para proxy
+ * Estadísticas
+ * Sincronización manual a gpodder.net
+* Correcciones:
+ * Controles del reproductor de audio
+ * Reducción de audio por canal (audio ducking)
+ * Desvanecimiento del control de video
+ * Controles para medios externos
+ * Parseo de feeds
+
+Versión 1.5.0
+-------------
+* Excluir episodios de la auto descarga usando palabras clave
+* Configurar que algunos feeds no se refresquen automáticamente
+* Reproductor mejorado
+* Interfaz de usuario mejorada
+* Corrección de fallos
+
+Versión 1.4.1
+-------------
+* Mejoras de rendimiento
+* Los botones hardware avanzan y retroceden en lugar de saltar episodio
+* Opción para saltar capítulos con el botón de avanzar
+* Opción para enviar reportes de fallo a los desarrolladores
+* Resaltar el episodio actual
+* Mejoras del widget
+
+Versión 1.4.0.12
 ----------------
-* Fix for crash on Huawei devices (media buttons may not work)
+* Arreglado cierre en dispositivos Huawei (los botones multimedia podría no funcionar)
 
 Versión 1.4
 -----------

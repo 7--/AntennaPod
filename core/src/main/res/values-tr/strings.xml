@@ -25,6 +25,7 @@
   <!--New episodes fragment-->
   <string name="recently_published_episodes_label">Son yayınlananlar</string>
   <string name="episode_filter_label">Sadece yeni bölümleri göster</string>
+  <!--Statistics fragment-->
   <!--Main activity-->
   <string name="drawer_open">Münüyü aç</string>
   <string name="drawer_close">Menüyü kapat</string>
@@ -66,7 +67,6 @@
   <string name="length_prefix">Uzunluk:\u0020</string>
   <string name="size_prefix">Boyut:\u0020</string>
   <string name="processing_label">İşleniyor</string>
-  <string name="loading_label">Yükleniyor...</string>
   <string name="save_username_password_label">Kullanıcı adı ve şifreyi kaydet</string>
   <string name="close_label">Kapat</string>
   <string name="retry_label">Yeniden dene</string>
@@ -77,7 +77,6 @@
   <string name="feed_auto_download_global">Genel</string>
   <string name="feed_auto_download_always">Her zaman</string>
   <string name="feed_auto_download_never">Hiçbir zaman</string>
-  <string name="send_label">Gönder...</string>
   <string name="episode_cleanup_never">Hiçbir zaman</string>
   <string name="episode_cleanup_queue_removal">Sırada değilse</string>
   <string name="episode_cleanup_after_listening">Bittikten sonra</string>
@@ -100,7 +99,6 @@
   <string name="mark_all_seen_label">Hepsini görüldü olarak işaretle</string>
   <string name="show_info_label">Bilgiyi göster</string>
   <string name="remove_feed_label">Cep yayını kaldır</string>
-  <string name="share_label">Paylaş...</string>
   <string name="share_link_label">Link\'i paylaş</string>
   <string name="share_link_with_position_label">Link\'i Konumla birlikte paylaş</string>
   <string name="share_feed_url_label">Besleme Adresini Paylaş</string>
@@ -169,7 +167,6 @@
   <string name="download_error_io_error">G/Ç Hatası</string>
   <string name="download_error_request_error">İstek hatası</string>
   <string name="download_error_db_access">Veritabanı erişim hatası</string>
-  <string name="downloads_left">\u0020Kalan indirme</string>
   <string name="downloads_processing">İndirmeler işleniyor</string>
   <string name="download_notification_title">Cep yayını verileri indiriliyor</string>
   <string name="download_report_content">%1$d indirme başarılı, %2$d başarısız</string>
@@ -254,7 +251,6 @@
   <string name="services_label">Servisler</string>
   <string name="flattr_label">Flattr</string>
   <string name="pref_episode_cleanup_title">Bölüm Temizliği</string>
-  <string name="pref_episode_cleanup_summary">Daha fazla yer gerektiğinde kuyrukta olmayan ve favorilere eklenmemiş bölümler kaldırılmak için uygundur</string>
   <string name="pref_pauseOnDisconnect_sum">Kulaklıklar çıkarıldığında veya bluetooth bağlantısı kesildiğinde çalmayı duraklat</string>
   <string name="pref_unpauseOnHeadsetReconnect_sum">Kulaklıklar yeniden bağlandığında çalmaya devam et</string>
   <string name="pref_unpauseOnBluetoothReconnect_sum">Bluetooth yeniden bağlandığında çalmaya devam et</string>
@@ -332,6 +328,11 @@
   <string name="pref_smart_mark_as_played_disabled">Devre dışı</string>
   <string name="pref_image_cache_size_title">Görüntü Önbelleği Boyutu</string>
   <string name="pref_image_cache_size_sum">Görüntüler için diskte tutulacak önbelleğin boyutu.</string>
+  <string name="crash_report_title">Çökme Raporu</string>
+  <string name="crash_report_sum">En son çökme raporunu e-posta ile gönder</string>
+  <string name="send_email">E-posta gönder</string>
+  <string name="experimental_pref">Deneysel</string>
+  <string name="pref_sonic_title">Sonic ortam yürütücüsü</string>
   <!--Auto-Flattr dialog-->
   <string name="auto_flattr_enable">Otomatik Flattr\'lamayı etkinleştir</string>
   <string name="auto_flattr_after_percent">Bölümün yüzde %d kısmı oynatıldığında Flattr\'la</string>
@@ -346,6 +347,7 @@
   <string name="found_in_title_label">Başlıkta bulundu</string>
   <!--OPML import and export-->
   <string name="opml_import_txtv_button_lable">OPML dosyaları cep yayınlarını bir cihazdan diğerine aktarmanıza yarar.</string>
+  <string name="opml_import_option">Seçenek %1$d</string>
   <string name="opml_import_explanation_1">Yerel dosya sisteminden belirli bir yol seçin.</string>
   <string name="opml_import_explanation_2">OPML dosyasını açmak için harici uygulamalardan Dropbox, Google Drive veya kendi favori dosya yöneticinizi kullanın.</string>
   <string name="opml_import_explanation_3">Google Mail, Dropbox, Google Drive gibi birçok uygulama ve çoğu dosya yöneticisi OPML dosyalarını AntennaPod <i>ile</i> <i>açabilir.</i></string>
@@ -353,15 +355,11 @@
   <string name="opml_import_label">OPML içe aktar</string>
   <string name="opml_directory_error">HATA!</string>
   <string name="reading_opml_label">OPML dosyası okunuyor</string>
-  <string name="opml_reader_error">OPML dosyası okunurken bir hata oluştu:</string>
-  <string name="opml_import_error_dir_empty">İça aktarma dizini boş</string>
   <string name="select_all_label">Hepsini seç</string>
   <string name="deselect_all_label">Tüm seçimleri geri al</string>
-  <string name="select_options_label">Seç ...</string>
   <string name="choose_file_from_filesystem">Yerel dosya sisteminden</string>
   <string name="choose_file_from_external_application">Harici uygulama kullan</string>
   <string name="opml_export_label">OPML dışa aktar</string>
-  <string name="exporting_label">Dışa aktarılıyor...</string>
   <string name="export_error_label">Dışa aktarma hatası</string>
   <string name="opml_export_success_title">Opml dışa aktarma başarılı.</string>
   <string name="opml_export_success_sum">.opml dosyasy yazıldı: \u0020</string>
@@ -372,6 +370,9 @@
   <string name="sleep_timer_label">Zamanlayıcı</string>
   <string name="time_left_label">Kalan süre:\u0020</string>
   <string name="time_dialog_invalid_input">Geçersiz giriş, zaman bir tam sayı olmalıdır</string>
+  <string name="timer_about_to_expire_label"><b>Zamanlayıcı süresi dolduğunda:</b></string>
+  <string name="shake_to_reset_label">Zamanyacıyı sıfırlamak için salla</string>
+  <string name="timer_vibration_label">Titret</string>
   <string name="time_seconds">saniye</string>
   <string name="time_minutes">dakika</string>
   <string name="time_hours">saat</string>
@@ -419,11 +420,15 @@
   <string name="selected_folder_label">Seçilen dizin:</string>
   <string name="create_folder_label">Dizin yarat</string>
   <string name="choose_data_directory">Veri dizinini seç</string>
+  <string name="choose_data_directory_message">Lütfen verileriniz için ana klasörü seçin. AntennaPod gerekli alt-klasörleri oluşturacaktır.</string>
   <string name="create_folder_msg">\"%1$s\" isminde yeni dizin oluştur?</string>
   <string name="create_folder_success">Yeni dizin yaratıldı</string>
   <string name="create_folder_error_no_write_access">Bu dizine yazılamadı</string>
   <string name="create_folder_error_already_exists">Dizin zaten var</string>
   <string name="create_folder_error">Dizin yaratılamadı</string>
+  <string name="folder_does_not_exist_error">\"%1$s\" adlı klasör yok</string>
+  <string name="folder_not_readable_error">\"%1$s\" klasörü okunabilir değil</string>
+  <string name="folder_not_writable_error">\"%1$s\" klasörü yazılabilir değil</string>
   <string name="folder_not_empty_dialog_title">Dizin boş değil</string>
   <string name="folder_not_empty_dialog_msg">Seçtiğiniz dizin dolu. Medya indirmeleri ve diğer dosyalar doğrudan bu dizine yerleştirilecek. Devam edilsin mi?</string>
   <string name="set_to_default_folder">Vaysayılan dizini seç</string>
@@ -435,7 +440,6 @@
   <!--Online feed view-->
   <string name="subscribe_label">Üye ol</string>
   <string name="subscribed_label">Üye olundu</string>
-  <string name="downloading_label">İndiriliyor...</string>
   <!--Content descriptions for image buttons-->
   <string name="show_chapters_label">Kısımları göster</string>
   <string name="show_shownotes_label">Notları göster</string>
@@ -463,7 +467,6 @@
   <!--AntennaPodSP-->
   <string name="sp_apps_importing_feeds_msg">Üyelikler tek-amaçlı uygulamalardan içe aktarılıyor...</string>
   <string name="search_itunes_label">iTunes\'da Arama</string>
-  <string name="select_label"><b>Seç ...</b></string>
   <string name="all_label">Tümü</string>
   <string name="selected_all_label">Tüm Bölümler Seçildi</string>
   <string name="none_label">Hiçbiri</string>
@@ -476,7 +479,6 @@
   <string name="selected_downloaded_label">İndirilen Bölümler Seçildi</string>
   <string name="not_downloaded_label">İndirilmeyen</string>
   <string name="selected_not_downloaded_label">İndirilmeyen Bölümler Seçildi</string>
-  <string name="sort_title"><b>Sırala ...</b></string>
   <string name="sort_title_a_z">Başlık (A \u2192 Z)</string>
   <string name="sort_title_z_a">Başlık (Z \u2192 A)</string>
   <string name="sort_date_new_old">Tarih (Yeni \u2192 Eski)</string>
@@ -484,4 +486,11 @@
   <string name="sort_duration_short_long">Süre (Kısa \u2192 Uzun)</string>
   <string name="sort_duration_long_short">Süre (Uzun \u2192 Kısa)</string>
   <!--Rating dialog-->
+  <string name="rating_title">AntennaPod\'u beğendiniz mi?</string>
+  <string name="rating_message">Eğer AntennaPod\'a oy vermek için biraz zamanını ayırırsanız memnun oluruz.</string>
+  <string name="rating_never_label">Bir daha gösterme</string>
+  <string name="rating_later_label">Daha sonra hatırlat</string>
+  <string name="rating_now_label">Evet, şimdi yapalım!</string>
+  <!--Audio controls-->
+  <!--proxy settings-->
 </resources>

@@ -1,7 +1,39 @@
 Список изменений
 ==========
 
-Version 1.4.0.12
+Version 1.6.0
+-------------
+* New features:
+ * Experimental Chromecast support
+ * Subscription overview
+ * Proxy support
+ * Statistics
+ * Manual gpodder.net sync
+* Fixes:
+ * Audioplayer controls
+ * Audio ducking
+ * Video control fade-out
+ * External media controls
+ * Feed parsing
+
+Version 1.5.0
+-------------
+* Exclude episodes from auto download by keyword
+* Configure feeds to prevent them from refreshing automatically
+* Improved audio player
+* Improved UI
+* Bug fixes
+
+Версия 1.4.1
+-------------
+* Улучшение производительности
+* Физические кнопки теперь осуществляют перемотку вперед и назад вместо пропуска
+* Возможность настройки пропуска для кнопки перемотки вперед
+* Возможность отправки отчетов о сбоях напрямую разработчикам
+* Выделение проигрываемого выпуска
+* Улучшения виджета
+
+Версия 1.4.0.12
 ----------------
 * Fix for crash on Huawei devices (media buttons may not work)
 

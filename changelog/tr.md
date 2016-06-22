@@ -1,6 +1,38 @@
 Yenilikler
 ==========
 
+Version 1.6.0
+-------------
+* New features:
+ * Experimental Chromecast support
+ * Subscription overview
+ * Proxy support
+ * Statistics
+ * Manual gpodder.net sync
+* Fixes:
+ * Audioplayer controls
+ * Audio ducking
+ * Video control fade-out
+ * External media controls
+ * Feed parsing
+
+Version 1.5.0
+-------------
+* Exclude episodes from auto download by keyword
+* Configure feeds to prevent them from refreshing automatically
+* Improved audio player
+* Improved UI
+* Hatalar düzeltildi
+
+Version 1.4.1
+-------------
+* Performance improvements
+* Hardware buttons now ff and rewind instead of skipping
+* Option to have forward button skip
+* Option to send crash reports directly to developers
+* Highlight currently playing episode
+* Widget improvements
+
 Version 1.4.0.12
 ----------------
 * Fix for crash on Huawei devices (media buttons may not work)
@@ -9,16 +41,16 @@ Version 1.4
 -----------
 * BLUETOOTH PERMISSION: Needed to be able to resume playback when a Bluetooth device reconnects with your phone
 * VIBRATE PERMISSION: Used optionally with the sleep timer
-* Native variable speed playback (experimental via options)
+* Doğal değişken çalma hızı (deneysel seçeneklerde)
 * Zamanlayıcı geliştirildi
-* Mark episodes as 'favorite'
+* Bölümleri 'favori' olarak işaretleme
 * Notification can skip episodes
 * Keep episodes when skipping them
-* Episode art on lock screen
-* Flexible episode cleanup
+* Kilitli ekranda bölüm resmi
+* Esnek bölüm temizliği
 * Rewind after pause
 * Kullanılabilirlik geliştirmeleri
-* Bug fixes
+* Hatalar düzeltildi
 
 Sürüm 1.3
 -----------

@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -65,13 +64,10 @@ public class TagListFragment extends ListFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                GpodnetTag tag = (GpodnetTag) getListAdapter().getItem(position);
-                MainActivity activity = (MainActivity) getActivity();
-                activity.loadChildFragment(TagFragment.newInstance(tag));
-            }
+        getListView().setOnItemClickListener((parent, view1, position, id) -> {
+            GpodnetTag tag = (GpodnetTag) getListAdapter().getItem(position);
+            MainActivity activity = (MainActivity) getActivity();
+            activity.loadChildFragment(TagFragment.newInstance(tag));
         });
 
         startLoadTask();
@@ -80,7 +76,7 @@ public class TagListFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        ((MainActivity) getActivity()).getMainActivtyActionBar().setTitle(R.string.add_feed_label);
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.add_feed_label);
     }
 
     @Override

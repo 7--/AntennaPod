@@ -10,6 +10,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -67,6 +68,7 @@ public class QueueFragment extends Fragment {
     public static final String TAG = "QueueFragment";
 
     private static final int EVENTS = EventDistributor.DOWNLOAD_HANDLED |
+            EventDistributor.UNREAD_ITEMS_UPDATE | // sent when playback position is reset
             EventDistributor.PLAYER_STATUS_UPDATE;
 
     private TextView infoBar;
@@ -228,12 +230,14 @@ public class QueueFragment extends Fragment {
         resetViewState();
     }
 
-    private final MenuItemUtils.UpdateRefreshMenuItemChecker updateRefreshMenuItemChecker = () -> {
-        return DownloadService.isRunning && DownloadRequester.getInstance().isDownloadingFeeds();
-    };
+    private final MenuItemUtils.UpdateRefreshMenuItemChecker updateRefreshMenuItemChecker =
+            () -> DownloadService.isRunning && DownloadRequester.getInstance().isDownloadingFeeds();
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if(!isAdded()) {
+            return;
+        }
         super.onCreateOptionsMenu(menu, inflater);
         if (queue != null) {
             inflater.inflate(R.menu.queue, menu);
@@ -267,10 +271,17 @@ public class QueueFragment extends Fragment {
         if (!super.onOptionsItemSelected(item)) {
             switch (item.getItemId()) {
                 case R.id.queue_lock:
-                    boolean locked = !UserPreferences.isQueueLocked();
-                    UserPreferences.setQueueLocked(locked);
+                    boolean newLockState = !UserPreferences.isQueueLocked();
+                    UserPreferences.setQueueLocked(newLockState);
                     getActivity().supportInvalidateOptionsMenu();
-                    recyclerAdapter.setLocked(locked);
+                    recyclerAdapter.setLocked(newLockState);
+                    if (newLockState) {
+                        Snackbar.make(getActivity().findViewById(R.id.content), R.string
+                                .queue_locked, Snackbar.LENGTH_SHORT).show();
+                    } else {
+                        Snackbar.make(getActivity().findViewById(R.id.content), R.string
+                                .queue_unlocked, Snackbar.LENGTH_SHORT).show();
+                    }
                     return true;
                 case R.id.refresh_item:
                     List<Feed> feeds = ((MainActivity) getActivity()).getFeeds();
@@ -365,7 +376,14 @@ public class QueueFragment extends Fragment {
         View root = inflater.inflate(R.layout.queue_fragment, container, false);
         infoBar = (TextView) root.findViewById(R.id.info_bar);
         recyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
+<<<<<<< HEAD
         recyclerView.getItemAnimator().setSupportsChangeAnimations(false);
+=======
+        RecyclerView.ItemAnimator animator = recyclerView.getItemAnimator();
+        if (animator instanceof SimpleItemAnimator) {
+            ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
+        }
+>>>>>>> 92e8e52414f569be4d82a770afb0c50f4674e8a9
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(getActivity()).build());
@@ -395,12 +413,12 @@ public class QueueFragment extends Fragment {
                     Log.d(TAG, "remove(" + position + ")");
                     final FeedItem item = queue.get(position);
                     final boolean isRead = item.isPlayed();
-                    DBWriter.markItemPlayed(FeedItem.PLAYED, item.getId());
+                    DBWriter.markItemPlayed(FeedItem.PLAYED, false, item.getId());
                     DBWriter.removeQueueItem(getActivity(), item, true);
                     Snackbar snackbar = Snackbar.make(root, getString(R.string.marked_as_read_label), Snackbar.LENGTH_LONG);
                     snackbar.setAction(getString(R.string.undo), v -> {
                         DBWriter.addQueueItemAt(getActivity(), item.getId(), position, false);
-                        if(false == isRead) {
+                        if(!isRead) {
                             DBWriter.markItemPlayed(FeedItem.UNPLAYED, item.getId());
                         }
                     });
@@ -409,12 +427,12 @@ public class QueueFragment extends Fragment {
 
                 @Override
                 public boolean isLongPressDragEnabled() {
-                    return false == UserPreferences.isQueueLocked();
+                    return !UserPreferences.isQueueLocked();
                 }
 
                 @Override
                 public boolean isItemViewSwipeEnabled() {
-                    return false == UserPreferences.isQueueLocked();
+                    return !UserPreferences.isQueueLocked();
                 }
 
                 @Override
@@ -459,6 +477,7 @@ public class QueueFragment extends Fragment {
             MainActivity activity = (MainActivity) getActivity();
             recyclerAdapter = new QueueRecyclerAdapter(activity, itemAccess,
                 new DefaultActionButtonCallback(activity), itemTouchHelper);
+            recyclerAdapter.setHasStableIds(true);
             recyclerView.setAdapter(recyclerAdapter);
         }
         if(queue == null || queue.size() == 0) {
@@ -578,7 +597,7 @@ public class QueueFragment extends Fragment {
             txtvEmpty.setVisibility(View.GONE);
             progLoading.setVisibility(View.VISIBLE);
         }
-        subscription = Observable.fromCallable(() -> DBReader.getQueue())
+        subscription = Observable.fromCallable(DBReader::getQueue)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(items -> {

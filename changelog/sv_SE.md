@@ -8,6 +8,38 @@ Prestandaförbättringar
 * Option to send crash reports directly to developers
 * Highlight currently playing episode
 
+Version 1.6.0
+-------------
+* Nya funktioner:
+ * Experimentellt stöd för Chromecast
+ * Prenumerationsöversikt
+ * Proxystöd
+ * Statistik
+ * Manuell gpodder.net synkronisering
+* Fixar:
+ * Ljuduppspelningskontroller
+ * Ljudduckning
+ * Fade-out på videokontroller
+ * Externa mediakontroller
+ * Flödestolkning
+
+Version 1.5.0
+-------------
+* Exkludera episoder från automatisk nedladdning baserat på nyckelord
+* Flöden kan ställas in att inte uppdateras automatiskt
+* Förbättrad ljudspelare
+* Förbättrat gränssnitt
+* Buggfixar
+
+Version 1.4.1
+-------------
+Prestandaförbättringar
+* Hårdvaruknappar spolar nu fram och tillbaka istället för hoppar mellan episoder
+* Möjlighet att låta hårdvaruknapp hoppa till nästa episod
+* Möjlighet att sända krashrapporter direkt till utvecklarna
+* Den episod som spelas framhävs bättre
+* Widgetförbättringar
+
 Version 1.4.0.12
 ----------------
 * Fixade krash på Huawei enheter (mediaknappar kanske inte fungerar)

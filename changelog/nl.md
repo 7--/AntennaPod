@@ -1,16 +1,41 @@
 Changelog
 ==========
-Version 1.4.1
--------------
-* Performance improvements
-* Hardware buttons now ff and rewind instead of skipping
-* Option to have forward button skip
-* Option to send crash reports directly to developers
-* Highlight currently playing episode
 
-Version 1.4.0.12
+Version 1.6.0
+-------------
+* New features:
+ * Experimental Chromecast support
+ * Subscription overview
+ * Proxy support
+ * Statistics
+ * Manual gpodder.net sync
+* Fixes:
+ * Audioplayer controls
+ * Audio ducking
+ * Video control fade-out
+ * External media controls
+ * Feed parsing
+
+Versie 1.5.0
+-------------
+* Afleveringen uitsluiten bij automatisch downloaden op basis van zoekwoorden
+* Sluit specifieke feeds uit van automatische updates
+* Verbeterde mediaspeler
+*  Verbeterde interface
+* Bugfixes
+
+Versie 1.4.1
+-------------
+* Verbeterde prestaties
+* Fysieke knoppen voor vooruit- en terugspeoelen ipv de aflevering overslaan
+* Optie 'Volgende' knop voor overslaan
+* Optie om crashrapport direct naar de ontwikkelaars te sturen
+* Duidelijke markering van huidige aflevering
+* Verbeterde widget
+
+Versie 1.4.0.12
 ----------------
-* Fix for crash on Huawei devices (media buttons may not work)
+* Oplossing voor crashes op Huawei toestellen (afspeelbediening werkt mogelijk niet)
 
 Versie 1.4
 -----------

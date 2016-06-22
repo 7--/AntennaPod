@@ -1,6 +1,38 @@
 Änderungen
 ==========
 
+Version 1.6.0
+-------------
+* Neue Funktionen:
+ * Unterstützung von Chromecast (experimentell)
+ * Abonnement Übersicht
+ * Unterstützung von Proxies
+ * Statistiken
+ * Manuelle Synchronization mit gpodder.net
+* Behobene Fehler:
+ * Wiedergabesteuerung
+ * Ducking (Absenken der Lautstärke bei anderen Signalen)
+ * Ausblenden der Video-Steuerelemente
+ * Externe Steuerelemente
+ * Einlesen von Feeds
+
+Version 1.5.0
+-------------
+* Schließe Episoden mit Hilfe von Schlüsselwörtern beim Automatischen Herunterladen aus
+* Schließe einzelne Feeds vom automatischen Aktualisieren aus
+* Verbesserter Audio-Player
+* Verbesserungen an der Benutzeroberfläche
+* Fehlerkorrekturen
+
+Version 1.4.1
+-------------
+* Performance-Verbesserungen
+* Tasten spulen nun vor oder zurück statt zur nächsten Episode zu springen
+* Einstellung, zur nächsten Episode zu springen statt vorzuspulen
+* Möglichkeit, Absturzberichte an Entwickler zu schicken
+* Hebe Episode hervor, die gerade abgespielt wird
+* Widget-Verbesserungen
+
 Version 1.4.0.12
 ----------------
 * Behebt Abstürze von Huawei-Geräten (Abspieltasten funktionieren möglicherweise nicht)

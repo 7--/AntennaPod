@@ -14,6 +14,7 @@
   <string name="gpodnet_main_label">gpodder.net</string>
   <string name="gpodnet_auth_label">gpodder.net login</string>
   <!--New episodes fragment-->
+  <!--Statistics fragment-->
   <!--Main activity-->
   <!--Webview actions-->
   <string name="open_in_browser_label">ब्राउज़र में खोलें</string>
@@ -41,7 +42,6 @@
   <string name="length_prefix">लंबाई:\u0020</string>
   <string name="size_prefix">साइज:\u0020</string>
   <string name="processing_label">प्रसंस्करण</string>
-  <string name="loading_label">लोड हो रहा है ...</string>
   <string name="save_username_password_label">यूज़रनेम और पासवर्ड सहेजें</string>
   <string name="close_label">बंद करें</string>
   <string name="retry_label">पुन: प्रयास</string>
@@ -95,7 +95,6 @@
   <string name="download_error_io_error">आईओ त्रुटि</string>
   <string name="download_error_request_error">अनुरोध त्रुटि</string>
   <string name="download_error_db_access">डेटाबेस का उपयोग त्रुटि</string>
-  <string name="downloads_left">\u0020Downloads छोड़ा</string>
   <string name="download_notification_title">पॉडकास्ट डेटा डाउनलोड करें</string>
   <string name="download_report_content">%1$d डाउनलोड सफल रहा, %2$d में विफल रहा है</string>
   <string name="download_log_title_unknown">अज्ञात शीर्षक</string>
@@ -207,12 +206,9 @@
   <string name="opml_import_label">OPML आयात</string>
   <string name="opml_directory_error">त्रुटि!</string>
   <string name="reading_opml_label">OPML फ़ाइल पढ़ना</string>
-  <string name="opml_reader_error">OPML दस्तावेज़ पढ़ते समय एक त्रुटि हुई है:</string>
-  <string name="opml_import_error_dir_empty">आयात निर्देशिका खाली है.</string>
   <string name="select_all_label">सभी का चयन करें</string>
   <string name="deselect_all_label">सभी का चयन रद्द करें</string>
   <string name="opml_export_label">OPML निर्यात</string>
-  <string name="exporting_label">निर्यात ...</string>
   <string name="export_error_label">निर्यात त्रुटि</string>
   <string name="opml_export_success_sum">.ompl फ़ाइल लिखा गया था:\u0020</string>
   <!--Sleep timer-->
@@ -266,10 +262,11 @@
   <!--Online feed view-->
   <string name="subscribe_label">सदस्यता लें</string>
   <string name="subscribed_label">सदस्यता ली गई</string>
-  <string name="downloading_label">डाउनलोड कर रहा है ...</string>
   <!--Content descriptions for image buttons-->
   <!--Feed information screen-->
   <!--Progress information-->
   <!--AntennaPodSP-->
   <!--Rating dialog-->
+  <!--Audio controls-->
+  <!--proxy settings-->
 </resources>

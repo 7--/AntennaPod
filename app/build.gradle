@@ -9,17 +9,17 @@ repositories {
 }
 
 dependencies {
+    compile project(":core")
     compile "com.android.support:support-v4:$supportVersion"
     compile "com.android.support:appcompat-v7:$supportVersion"
-    compile "com.android.support:gridlayout-v7:$supportVersion"
-    compile "com.android.support:cardview-v7:$supportVersion"
     compile "com.android.support:design:$supportVersion"
-    compile "com.android.support:recyclerview-v7:22.2.+"
+    compile "com.android.support:gridlayout-v7:$supportVersion"
+    compile "com.android.support:percent:$supportVersion"
+    compile "com.android.support:recyclerview-v7:$supportVersion"
     compile "org.apache.commons:commons-lang3:$commonslangVersion"
     compile("org.shredzone.flattr4j:flattr4j-core:$flattr4jVersion") {
         exclude group: "org.json", module: "json"
     }
-
     compile "commons-io:commons-io:$commonsioVersion"
     compile "org.jsoup:jsoup:$jsoupVersion"
     compile "com.github.bumptech.glide:glide:$glideVersion"
@@ -31,26 +31,32 @@ dependencies {
     compile "io.reactivex:rxjava:$rxJavaVersion"
     // And ProGuard rules for RxJava!
     compile "com.artemzin.rxjava:proguard-rules:$rxJavaRulesVersion"
-    compile "com.joanzapata.iconify:android-iconify-fontawesome:2.1.0"
-    compile "com.afollestad:material-dialogs:0.7.8.1"
-    compile "com.yqritc:recyclerview-flexibledivider:1.2.6"
+    compile "com.joanzapata.iconify:android-iconify-fontawesome:$iconifyVersion"
+    compile "com.joanzapata.iconify:android-iconify-material:$iconifyVersion"
+    compile("com.github.afollestad.material-dialogs:commons:$materialDialogsVersion") {
+        transitive = true
+    }
+    compile "com.yqritc:recyclerview-flexibledivider:$recyclerviewFlexibledividerVersion"
+    compile("com.githang:viewpagerindicator:2.5@aar") {
+        exclude module: "support-v4"
+    }
 
-    compile "com.github.AntennaPod:AntennaPod-AudioPlayer:v1.0.2"
+    compile "com.github.shts:TriangleLabelView:$triangleLabelViewVersion"
 
-    compile project(":core")
+    compile "com.github.AntennaPod:AntennaPod-AudioPlayer:$audioPlayerVersion"
 }
 
 def getMyVersionName() {
     def parsedManifestXml = (new XmlSlurper())
             .parse("${projectDir}/src/main/AndroidManifest.xml")
-            .declareNamespace(android:"http://schemas.android.com/apk/res/android")
+            .declareNamespace(android: "http://schemas.android.com/apk/res/android")
     return parsedManifestXml."@android:versionName"
 }
 
 def getMyVersionCode() {
     def parsedManifestXml = (new XmlSlurper())
             .parse("${projectDir}/src/main/AndroidManifest.xml")
-            .declareNamespace(android:"http://schemas.android.com/apk/res/android")
+            .declareNamespace(android: "http://schemas.android.com/apk/res/android")
     return parsedManifestXml."@android:versionCode".toInteger()
 }
 
@@ -65,6 +71,7 @@ android {
         versionName "${getMyVersionName()}"
         testApplicationId "de.test.antennapod"
         testInstrumentationRunner "de.test.antennapod.AntennaPodTestRunner"
+        generatedDensities = []
     }
 
     signingConfigs {
@@ -126,6 +133,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    aaptOptions {
+        additionalParameters "--no-version-vectors"
+    }
 }
 
 // about.html is templatized so that we can automatically insert
@@ -139,7 +150,7 @@ task filterAbout {
         from "src/main/templates/about.html"
         into "src/main/assets"
         filter(ReplaceTokens, tokens: [versionname: android.defaultConfig.versionName,
-                                       commit: "git rev-parse --short HEAD".execute().text])
+                                       commit     : "git rev-parse --short HEAD".execute().text])
     }
 }
 

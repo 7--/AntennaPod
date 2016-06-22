@@ -41,16 +41,19 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        uiTestUtils = new UITestUtils(getInstrumentation().getTargetContext());
+        Context context = getInstrumentation().getTargetContext();
+        uiTestUtils = new UITestUtils(context);
         uiTestUtils.setup();
 
         // create new database
+        PodDBAdapter.init(context);
         PodDBAdapter.deleteDatabase();
         PodDBAdapter adapter = PodDBAdapter.getInstance();
         adapter.open();
         adapter.close();
 
         // override first launch preference
+        // do this BEFORE calling getActivity()!
         prefs = getInstrumentation().getTargetContext().getSharedPreferences(MainActivity.PREF_NAME, Context.MODE_PRIVATE);
         prefs.edit().putBoolean(MainActivity.PREF_IS_FIRST_LAUNCH, false).commit();
 
@@ -71,7 +74,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
     private void openNavDrawer() {
-        solo.clickOnScreen(50, 50);
+        solo.clickOnImageButton(0);
+        getInstrumentation().waitForIdleSync();
     }
 
     public void testAddFeed() throws Exception {
@@ -106,6 +110,12 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.waitForView(android.R.id.list);
         assertEquals(solo.getString(R.string.episodes_label), getActionbarTitle());
 
+        // Subscriptions
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.subscriptions_label));
+        solo.waitForView(R.id.subscriptions_grid);
+        assertEquals(solo.getString(R.string.subscriptions_label), getActionbarTitle());
+
         // downloads
         openNavDrawer();
         solo.clickOnText(solo.getString(R.string.downloads_label));
@@ -125,7 +135,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertEquals(solo.getString(R.string.add_feed_label), getActionbarTitle());
 
         // podcasts
-        ListView list = (ListView)solo.getView(R.id.nav_list);
+        ListView list = (ListView) solo.getView(R.id.nav_list);
         for (int i = 0; i < uiTestUtils.hostedFeeds.size(); i++) {
             Feed f = uiTestUtils.hostedFeeds.get(i);
             solo.clickOnScreen(50, 50); // open nav drawer
@@ -137,9 +147,10 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
     private String getActionbarTitle() {
-        return ((MainActivity)solo.getCurrentActivity()).getMainActivtyActionBar().getTitle().toString();
+        return ((MainActivity) solo.getCurrentActivity()).getSupportActionBar().getTitle().toString();
     }
 
+    @SuppressWarnings("unchecked")
     @FlakyTest(tolerance = 3)
     public void testGoToPreferences() {
         openNavDrawer();
@@ -185,14 +196,14 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         openNavDrawer();
         solo.clickLongOnText(solo.getString(R.string.queue_label));
         solo.waitForDialogToOpen();
-        for(String title : titles) {
+        for (String title : titles) {
             solo.clickOnText(title);
         }
         solo.clickOnText(solo.getString(R.string.confirm_label));
         solo.waitForDialogToClose();
         List<String> hidden = UserPreferences.getHiddenDrawerItems();
         assertEquals(titles.length, hidden.size());
-        for(String tag : MainActivity.NAV_DRAWER_TAGS) {
+        for (String tag : MainActivity.NAV_DRAWER_TAGS) {
             assertTrue(hidden.contains(tag));
         }
     }

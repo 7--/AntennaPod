@@ -11,8 +11,9 @@
         <item>0</item>
         <item>15</item>
         <item>30</item>
-        <item>45</item>
         <item>60</item>
+        <item>120</item>
+        <item>300</item>
     </string-array>
 
 
@@ -75,15 +76,15 @@
     </string-array>
 
     <string-array name="playback_speed_values">
-        <item>0.5</item>
-        <item>0.6</item>
-        <item>0.7</item>
+        <item>0.50</item>
+        <item>0.60</item>
+        <item>0.70</item>
         <item>0.75</item>
-        <item>0.8</item>
+        <item>0.80</item>
         <item>0.85</item>
-        <item>0.9</item>
+        <item>0.90</item>
         <item>0.95</item>
-        <item>1.0</item>
+        <item>1.00</item>
         <item>1.05</item>
         <item>1.10</item>
         <item>1.15</item>
@@ -145,9 +146,11 @@
     <string-array name="nav_drawer_titles">
         <item>@string/queue_label</item>
         <item>@string/episodes_label</item>
+        <item>@string/subscriptions_label</item>
         <item>@string/downloads_label</item>
         <item>@string/playback_history_label</item>
         <item>@string/add_feed_label</item>
+        <item>@string/subscriptions_list_label</item>
     </string-array>
 
     <string-array name="nav_drawer_feed_order_options">
@@ -174,7 +177,7 @@
         <item>3</item>
     </string-array>
 
-    <string-array name="episode_hide_options">
+    <string-array name="episode_filter_options">
         <item>@string/hide_unplayed_episodes_label</item>
         <item>@string/hide_paused_episodes_label</item>
         <item>@string/hide_played_episodes_label</item>
@@ -184,7 +187,7 @@
         <item>@string/hide_not_downloaded_episodes_label</item>
     </string-array>
 
-    <string-array name="episode_hide_values">
+    <string-array name="episode_filter_values">
         <item>unplayed</item>
         <item>paused</item>
         <item>played</item>
@@ -210,4 +213,9 @@
         <item>500</item>
     </string-array>
 
+    <string-array name="compact_notification_buttons_options">
+        <item>@string/rewind_label</item>
+        <item>@string/fast_forward_label</item>
+        <item>@string/skip_episode_label</item>
+    </string-array>
 </resources>

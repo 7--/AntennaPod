@@ -8,12 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.util.ArrayMap;
 import android.util.Log;
 import android.util.Pair;
 
 import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -112,12 +111,17 @@ public class GpodnetSyncService extends Service {
             stopSelf();
             return;
         }
+        boolean initialSync =  GpodnetPreferences.getLastSubscriptionSyncTimestamp() == 0 &&
+                GpodnetPreferences.getLastEpisodeActionsSyncTimestamp() == 0;
         if(syncSubscriptions) {
             syncSubscriptionChanges();
             syncSubscriptions = false;
         }
         if(syncActions) {
-            syncEpisodeActions();
+            // we only sync episode actions after the subscriptions have been added to the database
+            if(!initialSync) {
+                syncEpisodeActions();
+            }
             syncActions = false;
         }
         stopSelf();
@@ -175,7 +179,7 @@ public class GpodnetSyncService extends Service {
         for (String downloadUrl : changes.getAdded()) {
             if (false == localSubscriptions.contains(downloadUrl) &&
                     false == localRemoved.contains(downloadUrl)) {
-                Feed feed = new Feed(downloadUrl, new Date(0));
+                Feed feed = new Feed(downloadUrl, null);
                 DownloadRequester.getInstance().downloadFeed(this, feed);
             }
         }
@@ -226,7 +230,7 @@ public class GpodnetSyncService extends Service {
         if(remoteActions.size() == 0) {
             return;
         }
-        Map<Pair<String, String>, GpodnetEpisodeAction> localMostRecentPlayAction = new HashMap<Pair<String, String>, GpodnetEpisodeAction>();
+        Map<Pair<String, String>, GpodnetEpisodeAction> localMostRecentPlayAction = new ArrayMap<>();
         for(GpodnetEpisodeAction action : localActions) {
             Pair key = new Pair(action.getPodcast(), action.getEpisode());
             GpodnetEpisodeAction mostRecent = localMostRecentPlayAction.get(key);
@@ -238,7 +242,7 @@ public class GpodnetSyncService extends Service {
         }
 
         // make sure more recent local actions are not overwritten by older remote actions
-        Map<Pair<String, String>, GpodnetEpisodeAction> mostRecentPlayAction = new HashMap<Pair<String, String>, GpodnetEpisodeAction>();
+        Map<Pair<String, String>, GpodnetEpisodeAction> mostRecentPlayAction = new ArrayMap<>();
         for (GpodnetEpisodeAction action : remoteActions) {
             switch (action.getAction()) {
                 case NEW:
@@ -315,6 +319,7 @@ public class GpodnetSyncService extends Service {
                 .setContentIntent(activityIntent)
                 .setSmallIcon(R.drawable.stat_notify_sync_error)
                 .setAutoCancel(true)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .build();
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(id, notification);

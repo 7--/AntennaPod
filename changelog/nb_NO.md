@@ -8,9 +8,44 @@ Ytelsesforbedringer
 * Valg for å sende kræsjrapporter direkte til utviklere
 * Highlight currently playing episode
 
+<<<<<<< HEAD
+=======
+Version 1.6.0
+-------------
+* New features:
+ * Experimental Chromecast support
+ * Subscription overview
+ * Proxy support
+ * Statistics
+ * Manual gpodder.net sync
+* Fixes:
+ * Audioplayer controls
+ * Audio ducking
+ * Video control fade-out
+ * External media controls
+ * Feed parsing
+
+Version 1.5.0
+-------------
+* Exclude episodes from auto download by keyword
+* Configure feeds to prevent them from refreshing automatically
+* Improved audio player
+* Improved UI
+* Feilrettinger
+
+Versjon 1.4.1
+-------------
+Ytelsesforbedringer
+* Hardware-knapper bukes nå til hurtigfrem- og tilbakespoling istedenfor hopping
+* Valg for å la fremspolingsknappen hoppe
+* Valg for å sende kræsjrapporter direkte til utviklere
+* Markering av avspillende episode
+* Widget-forbedringer
+
+>>>>>>> 92e8e52414f569be4d82a770afb0c50f4674e8a9
 Versjon 1.4.0.12
 ----------------
-* Fix for crash on Huawei devices (media buttons may not work)
+* Fiks for feil med Huawei-enheter (medieknappene kan hende ikke fungerer)
 
 Versjon 1.4
 -----------
@@ -134,7 +169,7 @@ Versjon 0.9.8.1
 
 Versjon 0.9.8.0
 ---------------
-* Added access to the gpodder.net directory
+* La til tilgang til gpodder.net-katalogen
 * Added ability to sync podcast subscriptions with the gpodder.net service
 * Automatic download can now be turned on or off for specific podcasts
 * Added option to pause playback when another app is playing sounds

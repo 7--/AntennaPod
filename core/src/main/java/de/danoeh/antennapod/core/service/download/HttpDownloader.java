@@ -8,10 +8,8 @@ import com.squareup.okhttp.Protocol;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
-import com.squareup.okhttp.internal.http.HttpDate;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpStatus;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -23,12 +21,14 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 import de.danoeh.antennapod.core.ClientConfig;
 import de.danoeh.antennapod.core.R;
 import de.danoeh.antennapod.core.feed.FeedImage;
+import de.danoeh.antennapod.core.feed.FeedMedia;
+import de.danoeh.antennapod.core.util.DateUtils;
 import de.danoeh.antennapod.core.util.DownloadError;
 import de.danoeh.antennapod.core.util.StorageUtils;
 import de.danoeh.antennapod.core.util.URIUtil;
@@ -68,13 +68,24 @@ public class HttpDownloader extends Downloader {
             final URI uri = URIUtil.getURIFromRequestUrl(request.getSource());
             Request.Builder httpReq = new Request.Builder().url(uri.toURL())
                     .header("User-Agent", ClientConfig.USER_AGENT);
-            if(request.getIfModifiedSince() > 0) {
-                long threeDaysAgo = System.currentTimeMillis() - 1000*60*60*24*3;
-                if(request.getIfModifiedSince() > threeDaysAgo) {
-                    Date date = new Date(request.getIfModifiedSince());
-                    String httpDate = HttpDate.format(date);
-                    Log.d(TAG, "addHeader(\"If-Modified-Since\", \"" + httpDate + "\")");
-                    httpReq.addHeader("If-Modified-Since", httpDate);
+            if(request.getFeedfileType() == FeedMedia.FEEDFILETYPE_FEEDMEDIA) {
+                // set header explicitly so that okhttp doesn't do transparent gzip
+                Log.d(TAG, "addHeader(\"Accept-Encoding\", \"identity\")");
+                httpReq.addHeader("Accept-Encoding", "identity");
+            }
+
+            if(!TextUtils.isEmpty(request.getLastModified())) {
+                String lastModified = request.getLastModified();
+                Date lastModifiedDate = DateUtils.parse(lastModified);
+                if(lastModifiedDate != null) {
+                    long threeDaysAgo = System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 3;
+                    if (lastModifiedDate.getTime() > threeDaysAgo) {
+                        Log.d(TAG, "addHeader(\"If-Modified-Since\", \"" + lastModified + "\")");
+                        httpReq.addHeader("If-Modified-Since", lastModified);
+                    }
+                } else {
+                    Log.d(TAG, "addHeader(\"If-None-Match\", \"" + lastModified + "\")");
+                    httpReq.addHeader("If-None-Match", lastModified);
                 }
             }
 
@@ -99,19 +110,20 @@ public class HttpDownloader extends Downloader {
                 Log.d(TAG, "Adding range header: " + request.getSoFar());
             }
 
-            Response response = null;
+            Response response;
             try {
                 response = httpClient.newCall(httpReq.build()).execute();
             } catch(IOException e) {
                 Log.e(TAG, e.toString());
                 if(e.getMessage().contains("PROTOCOL_ERROR")) {
-                    httpClient.setProtocols(Arrays.asList(Protocol.HTTP_1_1));
+                    httpClient.setProtocols(Collections.singletonList(Protocol.HTTP_1_1));
                     response = httpClient.newCall(httpReq.build()).execute();
                 }
                 else {
                     throw e;
                 }
             }
+
             responseBody = response.body();
             String contentEncodingHeader = response.header("Content-Encoding");
             boolean isGzip = false;
@@ -154,6 +166,9 @@ public class HttpDownloader extends Downloader {
                 if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     error = DownloadError.ERROR_UNAUTHORIZED;
                     details = String.valueOf(response.code());
+                } else if(response.code() == HttpURLConnection.HTTP_FORBIDDEN) {
+                    error = DownloadError.ERROR_FORBIDDEN;
+                    details = String.valueOf(response.code());
                 } else {
                     error = DownloadError.ERROR_HTTP_DATA_ERROR;
                     details = String.valueOf(response.code());
@@ -162,20 +177,29 @@ public class HttpDownloader extends Downloader {
                 return;
             }
 
-            if (!StorageUtils.storageAvailable(ClientConfig.applicationCallbacks.getApplicationInstance())) {
+            if (!StorageUtils.storageAvailable()) {
                 onFail(DownloadError.ERROR_DEVICE_NOT_FOUND, null);
                 return;
+            }
+
+            if(request.getFeedfileType() == FeedMedia.FEEDFILETYPE_FEEDMEDIA) {
+                String contentType = response.header("Content-Type");
+                Log.d(TAG, "content type: " + contentType);
+                if(contentType.startsWith("text/")) {
+                    onFail(DownloadError.ERROR_FILE_TYPE, null);
+                    return;
+                }
             }
 
             connection = new BufferedInputStream(responseBody.byteStream());
 
             String contentRangeHeader = (fileExists) ? response.header("Content-Range") : null;
 
-            if (fileExists && response.code() == HttpStatus.SC_PARTIAL_CONTENT
+            if (fileExists && response.code() == HttpURLConnection.HTTP_PARTIAL
                     && !TextUtils.isEmpty(contentRangeHeader)) {
                 String start = contentRangeHeader.substring("bytes ".length(),
                         contentRangeHeader.indexOf("-"));
-                request.setSoFar(Long.valueOf(start));
+                request.setSoFar(Long.parseLong(start));
                 Log.d(TAG, "Starting download at position " + request.getSoFar());
 
                 out = new RandomAccessFile(destination, "rw");
@@ -199,21 +223,18 @@ public class HttpDownloader extends Downloader {
             long freeSpace = StorageUtils.getFreeSpaceAvailable();
             Log.d(TAG, "Free space is " + freeSpace);
 
-            if (request.getSize() != DownloadStatus.SIZE_UNKNOWN
-                    && request.getSize() > freeSpace) {
+            if (request.getSize() != DownloadStatus.SIZE_UNKNOWN && request.getSize() > freeSpace) {
                 onFail(DownloadError.ERROR_NOT_ENOUGH_SPACE, null);
                 return;
             }
 
             Log.d(TAG, "Starting download");
             try {
-                while (!cancelled
-                        && (count = connection.read(buffer)) != -1) {
+                while (!cancelled && (count = connection.read(buffer)) != -1) {
                     out.write(buffer, 0, count);
                     request.setSoFar(request.getSoFar() + count);
-                    request.setProgressPercent((int) (((double) request
-                            .getSoFar() / (double) request
-                            .getSize()) * 100));
+                    int progressPercent = (int)(100.0 * request.getSoFar() / request.getSize());
+                    request.setProgressPercent(progressPercent);
                 }
             } catch(IOException e) {
                 Log.e(TAG, Log.getStackTraceString(e));
@@ -225,16 +246,18 @@ public class HttpDownloader extends Downloader {
                 // written file. This check cannot be made if compression was used
                 if (!isGzip && request.getSize() != DownloadStatus.SIZE_UNKNOWN &&
                         request.getSoFar() != request.getSize()) {
-                    onFail(DownloadError.ERROR_IO_ERROR,
-                            "Download completed but size: " +
-                                    request.getSoFar() +
-                                    " does not equal expected size " +
-                                    request.getSize()
-                    );
+                    onFail(DownloadError.ERROR_IO_ERROR, "Download completed but size: " +
+                            request.getSoFar() + " does not equal expected size " + request.getSize());
                     return;
                 } else if(request.getSize() > 0 && request.getSoFar() == 0){
                     onFail(DownloadError.ERROR_IO_ERROR, "Download completed, but nothing was read");
                     return;
+                }
+                String lastModified = response.header("Last-Modified");
+                if(lastModified != null) {
+                    request.setLastModified(lastModified);
+                } else {
+                    request.setLastModified(response.header("ETag"));
                 }
                 onSuccess();
             }
@@ -268,7 +291,8 @@ public class HttpDownloader extends Downloader {
     }
 
     private void onFail(DownloadError reason, String reasonDetailed) {
-        Log.d(TAG, "Download failed");
+        Log.d(TAG, "onFail() called with: " + "reason = [" + reason + "], " +
+                "reasonDetailed = [" + reasonDetailed + "]");
         result.setFailed(reason, reasonDetailed);
         if (request.isDeleteOnFailure()) {
             cleanup();

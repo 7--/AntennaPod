@@ -46,9 +46,10 @@ public class PlaybackTest extends ActivityInstrumentationTestCase2<MainActivity>
     public void setUp() throws Exception {
         super.setUp();
 
-        PodDBAdapter.deleteDatabase();
-
         context = getInstrumentation().getTargetContext();
+
+        PodDBAdapter.init(context);
+        PodDBAdapter.deleteDatabase();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         prefs.edit()
@@ -79,9 +80,9 @@ public class PlaybackTest extends ActivityInstrumentationTestCase2<MainActivity>
 
         super.tearDown();
     }
-
     private void openNavDrawer() {
-        solo.clickOnScreen(50, 50);
+        solo.clickOnImageButton(0);
+        getInstrumentation().waitForIdleSync();
     }
 
     private void setContinuousPlaybackPreference(boolean value) {

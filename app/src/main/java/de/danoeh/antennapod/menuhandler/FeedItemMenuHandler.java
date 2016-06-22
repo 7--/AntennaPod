@@ -3,6 +3,7 @@ package de.danoeh.antennapod.menuhandler;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -41,7 +42,7 @@ public class FeedItemMenuHandler {
          * menu-object and call setVisibility(visibility) on the returned
          * MenuItem object.
          */
-        abstract void setItemVisibility(int id, boolean visible);
+        void setItemVisibility(int id, boolean visible);
     }
 
     /**
@@ -54,19 +55,19 @@ public class FeedItemMenuHandler {
      * @param showExtendedMenu True if MenuItems that let the user share information about
      *                         the FeedItem and visit its website should be set visible. This
      *                         parameter should be set to false if the menu space is limited.
-     * @param queueAccess      Used for testing if the queue contains the selected item
+     * @param queueAccess      Used for testing if the queue contains the selected item; only used for
+     *                         move to top/bottom in the queue
      * @return Returns true if selectedItem is not null.
      */
-    public static boolean onPrepareMenu(Context context, MenuInterface mi, FeedItem selectedItem,
-                                        boolean showExtendedMenu, LongList queueAccess) {
+    public static boolean onPrepareMenu(MenuInterface mi,
+                                        FeedItem selectedItem,
+                                        boolean showExtendedMenu,
+                                        @Nullable LongList queueAccess) {
         if (selectedItem == null) {
             return false;
         }
         boolean hasMedia = selectedItem.getMedia() != null;
-        boolean isPlaying = hasMedia
-                && selectedItem.getState() == FeedItem.State.PLAYING;
-
-        FeedItem.State state = selectedItem.getState();
+        boolean isPlaying = hasMedia && selectedItem.getState() == FeedItem.State.PLAYING;
 
         if (!isPlaying) {
             mi.setItemVisibility(R.id.skip_episode_item, false);
@@ -95,7 +96,7 @@ public class FeedItemMenuHandler {
             mi.setItemVisibility(R.id.share_download_url_item, false);
             mi.setItemVisibility(R.id.share_download_url_with_position_item, false);
         }
-        if(false == hasMedia || selectedItem.getMedia().getPosition() <= 0) {
+        if(!hasMedia || selectedItem.getMedia().getPosition() <= 0) {
             mi.setItemVisibility(R.id.share_link_with_position_item, false);
             mi.setItemVisibility(R.id.share_download_url_with_position_item, false);
         }
@@ -110,7 +111,7 @@ public class FeedItemMenuHandler {
             mi.setItemVisibility(R.id.reset_position, false);
         }
 
-        if(false == UserPreferences.isEnableAutodownload()) {
+        if(!UserPreferences.isEnableAutodownload()) {
             mi.setItemVisibility(R.id.activate_auto_download, false);
             mi.setItemVisibility(R.id.deactivate_auto_download, false);
         } else if(selectedItem.getAutoDownload()) {
@@ -137,9 +138,12 @@ public class FeedItemMenuHandler {
      * @param excludeIds Menu item that should be excluded
      * @return true if selectedItem is not null.
      */
-    public static boolean onPrepareMenu(Context context, MenuInterface mi, FeedItem selectedItem,
-                                        boolean showExtendedMenu, LongList queueAccess, int... excludeIds) {
-        boolean rc = onPrepareMenu(context, mi, selectedItem, showExtendedMenu, queueAccess);
+    public static boolean onPrepareMenu(MenuInterface mi,
+                                        FeedItem selectedItem,
+                                        boolean showExtendedMenu,
+                                        LongList queueAccess,
+                                        int... excludeIds) {
+        boolean rc = onPrepareMenu(mi, selectedItem, showExtendedMenu, queueAccess);
         if (rc && excludeIds != null) {
             for (int id : excludeIds) {
                 mi.setItemVisibility(id, false);
@@ -217,7 +221,7 @@ public class FeedItemMenuHandler {
                     context.startActivity(intent);
                 } else {
                     Toast.makeText(context, context.getString(R.string.download_error_malformed_url),
-                            Toast.LENGTH_SHORT);
+                            Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.support_item:

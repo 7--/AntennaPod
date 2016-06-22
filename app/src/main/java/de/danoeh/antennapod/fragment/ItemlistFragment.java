@@ -10,9 +10,7 @@ import android.graphics.LightingColorFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.support.v4.util.Pair;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -50,7 +48,6 @@ import de.danoeh.antennapod.core.dialog.DownloadRequestErrorDialogCreator;
 import de.danoeh.antennapod.core.event.DownloadEvent;
 import de.danoeh.antennapod.core.event.DownloaderUpdate;
 import de.danoeh.antennapod.core.event.FeedItemEvent;
-import de.danoeh.antennapod.core.event.QueueEvent;
 import de.danoeh.antennapod.core.feed.EventDistributor;
 import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.feed.FeedEvent;
@@ -67,7 +64,6 @@ import de.danoeh.antennapod.core.storage.DBTasks;
 import de.danoeh.antennapod.core.storage.DownloadRequestException;
 import de.danoeh.antennapod.core.storage.DownloadRequester;
 import de.danoeh.antennapod.core.util.FeedItemUtil;
-import de.danoeh.antennapod.core.util.LongList;
 import de.danoeh.antennapod.core.util.gui.MoreContentListFooterUtil;
 import de.danoeh.antennapod.dialog.EpisodesApplyActionFragment;
 import de.danoeh.antennapod.menuhandler.FeedItemMenuHandler;
@@ -87,6 +83,7 @@ public class ItemlistFragment extends ListFragment {
     private static final String TAG = "ItemlistFragment";
 
     private static final int EVENTS = EventDistributor.UNREAD_ITEMS_UPDATE
+            | EventDistributor.FEED_LIST_UPDATE
             | EventDistributor.PLAYER_STATUS_UPDATE;
 
     public static final String EXTRA_SELECTED_FEEDITEM = "extra.de.danoeh.antennapod.activity.selected_feeditem";
@@ -98,7 +95,6 @@ public class ItemlistFragment extends ListFragment {
 
     private long feedID;
     private Feed feed;
-    private LongList queuedItemsIds;
 
     private boolean itemsLoaded = false;
     private boolean viewsCreated = false;
@@ -144,34 +140,26 @@ public class ItemlistFragment extends ListFragment {
     @Override
     public void onStart() {
         super.onStart();
-        EventDistributor.getInstance().register(contentUpdate);
-        EventBus.getDefault().registerSticky(this);
         if (viewsCreated && itemsLoaded) {
             onFragmentLoaded();
         }
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        EventDistributor.getInstance().unregister(contentUpdate);
-        EventBus.getDefault().unregister(this);
-        if(subscription != null) {
-            subscription.unsubscribe();
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume()");
+        EventDistributor.getInstance().register(contentUpdate);
+        EventBus.getDefault().registerSticky(this);
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle("");
         updateProgressBarVisibility();
         loadItems();
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onPause() {
+        super.onPause();
+        EventDistributor.getInstance().unregister(contentUpdate);
+        EventBus.getDefault().unregister(this);
         if(subscription != null) {
             subscription.unsubscribe();
         }
@@ -192,16 +180,15 @@ public class ItemlistFragment extends ListFragment {
     private final MenuItemUtils.UpdateRefreshMenuItemChecker updateRefreshMenuItemChecker = new MenuItemUtils.UpdateRefreshMenuItemChecker() {
         @Override
         public boolean isRefreshing() {
-            if (feed != null && DownloadService.isRunning && DownloadRequester.getInstance().isDownloadingFile(feed)) {
-                return true;
-            } else {
-                return false;
-            }
+            return feed != null && DownloadService.isRunning && DownloadRequester.getInstance().isDownloadingFile(feed);
         }
     };
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if(!isAdded()) {
+            return;
+        }
         super.onCreateOptionsMenu(menu, inflater);
 
         if (itemsLoaded) {
@@ -256,8 +243,8 @@ public class ItemlistFragment extends ListFragment {
                 if (!FeedMenuHandler.onOptionsItemClicked(getActivity(), item, feed)) {
                     switch (item.getItemId()) {
                         case R.id.episode_actions:
-                            EpisodesApplyActionFragment fragment = new EpisodesApplyActionFragment();
-                            fragment.setEpisodes(feed.getItems());
+                            EpisodesApplyActionFragment fragment = EpisodesApplyActionFragment
+                                    .newInstance(feed.getItems());
                             ((MainActivity)getActivity()).loadChildFragment(fragment);
                             return true;
                         case R.id.remove_item:
@@ -329,7 +316,7 @@ public class ItemlistFragment extends ListFragment {
 
         contextMenu = menu;
         lastMenuInfo = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        FeedItemMenuHandler.onPrepareMenu(getActivity(), contextMenuInterface, item, true, queuedItemsIds);
+        FeedItemMenuHandler.onPrepareMenu(contextMenuInterface, item, true, null);
     }
 
     @Override
@@ -367,7 +354,6 @@ public class ItemlistFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ((ActionBarActivity) getActivity()).getSupportActionBar().setTitle("");
 
         registerForContextMenu(getListView());
 
@@ -379,15 +365,14 @@ public class ItemlistFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        FeedItem selection = adapter.getItem(position - l.getHeaderViewsCount());
-        if (selection != null) {
-            ((MainActivity) getActivity()).loadChildFragment(ItemFragment.newInstance(selection.getId()));
+        if(adapter == null) {
+            return;
         }
-    }
-
-    public void onEvent(QueueEvent event) {
-        Log.d(TAG, "onEvent() called with: " + "event = [" + event + "]");
-        loadItems();
+        position -= l.getHeaderViewsCount();
+        MainActivity activity = (MainActivity) getActivity();
+        long[] ids = FeedItemUtil.getIds(feed.getItems());
+        activity.loadChildFragment(ItemFragment.newInstance(ids, position));
+        activity.getSupportActionBar().setTitle(feed.getTitle());
     }
 
     public void onEvent(FeedEvent event) {
@@ -399,7 +384,6 @@ public class ItemlistFragment extends ListFragment {
 
     public void onEventMainThread(FeedItemEvent event) {
         Log.d(TAG, "onEventMainThread() called with: " + "event = [" + event + "]");
-        boolean queueChanged = false;
         if(feed == null || feed.getItems() == null || adapter == null) {
             return;
         }
@@ -546,15 +530,12 @@ public class ItemlistFragment extends ListFragment {
                 .dontAnimate()
                 .into(imgvCover);
 
-        butShowInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (viewsCreated && itemsLoaded) {
-                    Intent startIntent = new Intent(getActivity(), FeedInfoActivity.class);
-                    startIntent.putExtra(FeedInfoActivity.EXTRA_FEED_ID,
-                            feed.getId());
-                    startActivity(startIntent);
-                }
+        butShowInfo.setOnClickListener(v -> {
+            if (viewsCreated && itemsLoaded) {
+                Intent startIntent = new Intent(getActivity(), FeedInfoActivity.class);
+                startIntent.putExtra(FeedInfoActivity.EXTRA_FEED_ID,
+                        feed.getId());
+                startActivity(startIntent);
             }
         });
     }
@@ -572,16 +553,13 @@ public class ItemlistFragment extends ListFragment {
             View header = inflater.inflate(R.layout.more_content_list_footer, lv, false);
             lv.addFooterView(header);
             listFooter = new MoreContentListFooterUtil(header);
-            listFooter.setClickListener(new MoreContentListFooterUtil.Listener() {
-                @Override
-                public void onClick() {
-                    if (feed != null) {
-                        try {
-                            DBTasks.loadNextPageOfFeed(getActivity(), feed, false);
-                        } catch (DownloadRequestException e) {
-                            e.printStackTrace();
-                            DownloadRequestErrorDialogCreator.newRequestErrorDialog(getActivity(), e.getMessage());
-                        }
+            listFooter.setClickListener(() -> {
+                if (feed != null) {
+                    try {
+                        DBTasks.loadNextPageOfFeed(getActivity(), feed, false);
+                    } catch (DownloadRequestException e) {
+                        e.printStackTrace();
+                        DownloadRequestErrorDialogCreator.newRequestErrorDialog(getActivity(), e.getMessage());
                     }
                 }
             });
@@ -605,11 +583,6 @@ public class ItemlistFragment extends ListFragment {
         }
 
         @Override
-        public boolean isInQueue(FeedItem item) {
-            return (queuedItemsIds != null) && queuedItemsIds.contains(item.getId());
-        }
-
-        @Override
         public int getItemDownloadProgressPercent(FeedItem item) {
             if (downloaderList != null) {
                 for (Downloader downloader : downloaderList) {
@@ -628,14 +601,12 @@ public class ItemlistFragment extends ListFragment {
         if(subscription != null) {
             subscription.unsubscribe();
         }
-
-        subscription = Observable.fromCallable(() -> loadData())
+        subscription = Observable.fromCallable(this::loadData)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> {
                     if (result != null) {
-                        feed = result.first;
-                        queuedItemsIds = result.second;
+                        feed = result;
                         itemsLoaded = true;
                         if (viewsCreated) {
                             onFragmentLoaded();
@@ -646,14 +617,14 @@ public class ItemlistFragment extends ListFragment {
                 });
     }
 
-    private Pair<Feed, LongList> loadData() {
+    private Feed loadData() {
         Feed feed = DBReader.getFeed(feedID);
+        DBReader.loadAdditionalFeedItemListData(feed.getItems());
         if(feed != null && feed.getItemFilter() != null) {
             FeedItemFilter filter = feed.getItemFilter();
             feed.setItems(filter.filter(feed.getItems()));
         }
-        LongList queuedItemsIds = DBReader.getQueueIDList();
-        return Pair.create(feed, queuedItemsIds);
+        return feed;
     }
 
 }

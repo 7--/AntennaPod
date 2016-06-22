@@ -45,38 +45,20 @@ public class AddFeedFragment extends Fragment {
         Button butSearchITunes = (Button) root.findViewById(R.id.butSearchItunes);
 
         final MainActivity activity = (MainActivity) getActivity();
-        activity.getMainActivtyActionBar().setTitle(R.string.add_feed_label);
+        activity.getSupportActionBar().setTitle(R.string.add_feed_label);
 
-        butSearchITunes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.loadChildFragment(new ItunesSearchFragment());
-            }
-        });
+        butSearchITunes.setOnClickListener(v -> activity.loadChildFragment(new ItunesSearchFragment()));
 
-        butBrowserGpoddernet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.loadChildFragment(new GpodnetMainFragment());
-            }
-        });
+        butBrowserGpoddernet.setOnClickListener(v -> activity.loadChildFragment(new GpodnetMainFragment()));
 
-        butOpmlImport.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getActivity(),
-                        OpmlImportFromPathActivity.class));
-            }
-        });
+        butOpmlImport.setOnClickListener(v -> startActivity(new Intent(getActivity(),
+                OpmlImportFromPathActivity.class)));
 
-        butConfirm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), OnlineFeedViewActivity.class);
-                intent.putExtra(OnlineFeedViewActivity.ARG_FEEDURL, etxtFeedurl.getText().toString());
-                intent.putExtra(OnlineFeedViewActivity.ARG_TITLE, getString(R.string.add_feed_label));
-                startActivity(intent);
-            }
+        butConfirm.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), OnlineFeedViewActivity.class);
+            intent.putExtra(OnlineFeedViewActivity.ARG_FEEDURL, etxtFeedurl.getText().toString());
+            intent.putExtra(OnlineFeedViewActivity.ARG_TITLE, getString(R.string.add_feed_label));
+            startActivity(intent);
         });
 
         return root;
